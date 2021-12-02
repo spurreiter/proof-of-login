@@ -1,6 +1,9 @@
 node_modules
 coverage
+example
 test
 *.tgz
 *.log
 .*
+rollup.config.js
+tsconfig.json
