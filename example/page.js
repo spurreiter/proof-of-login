@@ -27,51 +27,83 @@ export const homePage = ({ title = '' }) => {
   return page({ title, body })
 }
 
-export const loginPage = ({ challenge = '', action = '/login', error = '', username = '' }) => {
+export const userPage = ({ username = '' }) => {
+  const title = `Hi ${username}!`
+  const body = `
+  <h1>${title}</h1>
+  <nav>
+    <a href="/logout">logout</a>
+  </nav>
+  `
+  return page({ title, body })
+}
+
+export const loginPage = ({
+  challenge = '',
+  action = '/login',
+  error = '',
+  username = '',
+  simplechallenge = ''
+}) => {
   const body = `
   <style>
-  .login label, .login input { display: block; margin-bottom: 0.3em; }
-  .login input { padding: 0.5em; }
-  .login button { margin: 0.3em 0; padding: 0.5em; }
-  .login .error { padding: 0.5em; background-color: #ffddee; color: #ff1133; }
+  label, input { display: block; margin-bottom: 0.3em; }
+  input { padding: 0.5em; }
+  button { margin: 0.3em 0; padding: 0.5em; }
+  .error { padding: 0.5em; background-color: #ffddee; color: #ff1133; }
   </style>
-  <form class="login" method="post" action="${action}">
+  <form id="loginForm" method="post" action="${action}">
     <fieldset>
       <legend>Login</legend>
 
       ${error ? `<div class="error">${error.replace(/\n/g, '<br>')}</div>` : ''}
 
       <label for="username">username</label>
-      <input id="username" name="username" type="text" value="${username}" placeholder="alice" required>
+      <input id="username" name="username" type="text" value="${username}" placeholder="alice">
 
       <label for="password">password</label>
-      <input id="password" name="password" type="password" required>
+      <input id="password" name="password" type="password">
 
-      <input id="challenge" name="challenge" type="hidden" value="${challenge}">
+      <label for="challenge">challenge</label>
+      <input id="challenge" name="challenge" type="text" value="${challenge}">
       <input id="nonce" name="nonce" type="hidden" value="">
 
-      <button id="submit" type="submit">Sign in</button>
+      <button id="signin" type="submit">Sign in</button>
 
       <div id="wait"></div>
-      </fieldset>
+    </fieldset>
   </form>
   <script type="module">
   import { solve } from '/js/browser.js'
 
+  const timeout = (ms) => new Promise(resolve => setTimeout(() => resolve(), ms))
   const did = (id) => document.getElementById(id)
+  const $form = did('loginForm')
+  const $button = did('signin')
 
   async function calcNonce() {
-    const $submit = did('submit')
-    $submit.disabled = true
+    $button.disabled = true
     const $wait = did('wait')
     $wait.innerText = 'calculating nonce...'
     const time = Date.now()
     did('nonce').value = await solve(did('challenge').value)
     $wait.innerText = \`calculating nonce took \${Date.now() - time} ms\`
-    $submit.disabled = false
+    await timeout(300)
+    $button.disabled = false
   }
 
-  calcNonce()
+  let doSubmit = false
+  $form.addEventListener('submit', (ev) => {
+    if (doSubmit) return true
+    ev.preventDefault()
+    doSubmit = true
+    calcNonce().then(async () => {
+      $form.submit()
+      $button.disabled = true
+    })
+    return false
+  })
+
   </script>
   `
 

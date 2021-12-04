@@ -47,7 +47,7 @@ export class Challenge {
    * | complexity | algo | timestamp | random | signature | // Description
    * ```
    * @param {number} complexity
-   * @param {string} algo
+   * @param {string} [algo='SHA-256'] SHA-1, SHA-256, SHA-348, SHA-512
    * @returns {Promise<string>}
    */
   async create (complexity, algo = 'SHA-256') {
@@ -59,7 +59,7 @@ export class Challenge {
     const algoNum = ALGO_MAP.indexOf(algo)
 
     assert(!isNaN(complexity), 'Complexity is not a number')
-    assert(complexity < 255, 'Complexity must be less than 255')
+    assert(complexity >= 0 && complexity < 255, 'Complexity must be in range [0..255]')
     assert(algoNum !== undefined, `Unsupported hash algorithm ${algo}`)
 
     let offset = 0

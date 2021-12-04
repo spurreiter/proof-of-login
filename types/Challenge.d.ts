@@ -10,7 +10,7 @@ export class Challenge {
      * | complexity | algo | timestamp | random | signature | // Description
      * ```
      * @param {number} complexity
-     * @param {string} algo
+     * @param {string} [algo='SHA-256'] SHA-1, SHA-256, SHA-348, SHA-512
      * @returns {Promise<string>}
      */
     create(complexity: number, algo?: string): Promise<string>;

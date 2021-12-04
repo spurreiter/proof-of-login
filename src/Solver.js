@@ -39,18 +39,22 @@ function getNonce () {
 
 /**
  * @param {string} challenge base64 encoded challenge
+ * @param {boolean} [noWait=false] disable handover to event loop
  */
-export async function solve (challenge) {
+export async function solve (challenge, noWait = false) {
   let { complexity, algo, buffer } = readChallenge(challenge)
   complexity = Number(complexity)
   assert(!isNaN(complexity), 'Complexity must be a number')
+
+  let count = 0
 
   while (true) { // may take a long time
     const nonce = getNonce()
     const bufferConcat = new Uint8Array([...buffer, ...nonce])
     // @ts-ignore
     const digest = await crypto.subtle.digest(algo, bufferConcat)
+    count++
     if (checkComplexity(complexity, new Uint8Array(digest))) return toBase64(nonce)
-    await timeout() // allow eventloop to kick-in
+    if (!noWait && (count % 100) === 0) await timeout() // allow eventloop to kick-in
   }
 }

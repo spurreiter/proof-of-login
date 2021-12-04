@@ -1,0 +1,10 @@
+set style data lines
+set logscale y
+
+set term svg
+set title "Complexity vs. Time"
+set xlabel "Complexity"
+set ylabel "time [ms]"
+set output "benchmark.svg"
+
+plot [0:22] "plot.dat" with yerrorbars
