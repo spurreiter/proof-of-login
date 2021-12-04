@@ -1,6 +1,6 @@
 {
   "name": "proof-of-login",
-  "version": "1.0.0-0",
+  "version": "1.0.0",
   "description": "a proof-of-work for your login or registration endpoints",
   "keywords": [
     "proof-of-work",
